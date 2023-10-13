@@ -1,4 +1,4 @@
-function [data_selected,figid] = select_side_points(data, side_name, figid)
+function [data_selected,figid] = select_points_side(data, side_name, figid)
 %UI for selecting points for each side
 %
 % Input Arguments:
@@ -16,8 +16,9 @@ if nargin < 3
 end
 
 
+
 %prompt message
-fprintf('Select points for side %s (enter to exit, rigth click to remove)\n',side_name)
+fprintf('Select points for side %s (close or enter to exit, rigth click to remove)\n',side_name)
 %initalize coodinates
 x_reg = [];
 y_reg = [];
@@ -26,6 +27,11 @@ iter = 0;
 while true
     %record point
     [x,y,button] = ginput(1);
+
+    %exit
+    if isempty(button) || (iter > 1 && norm([x-x_reg(1,:),y-y_reg(1)]) < 1)
+        break
+    end
 
     %button options
     if button == 1
@@ -38,15 +44,11 @@ while true
             x_reg = x_reg(1:end~=i_rm);
             y_reg = y_reg(1:end~=i_rm);
         end
-    elseif isempty(button)
-        break
     end
 
     %plot selection boundary
-    if iter > 2;
-        figure(figid); 
-        plot(x_reg,y_reg,'k--o');
-    end
+    figure(figid); 
+    plot(x_reg,y_reg,'k--o');
 end
 
 %handle special cases:
@@ -55,9 +57,8 @@ end
 if length(x_reg) < 2
     error('Insufficient number of points')
 elseif length(x_reg) == 2
-    [x_reg,y_reg] = meshgrid(x_reg,y_reg);
-    x_reg = reshape(x_reg,1,[]);
-    y_reg = reshape(y_reg,1,[]);
+    x_reg = [x_reg(1),x_reg(2),x_reg(2),x_reg(1)]';
+    y_reg = [y_reg(1),y_reg(1),y_reg(2),y_reg(2)]';
 end
 
 %indicies of selected data
@@ -69,7 +70,6 @@ data_selected = data(i_in,:);
 %plot closed polygon and selected points
 figure(figid);
 plot([x_reg;x_reg(1)],[y_reg;y_reg(1)],'k--o');
-plot(data_selected(:,1),data_selected(:,2),'-o','Color',"#0072BD",'MarkerSize',15);
-
+figid = plot_points_select(data_selected,figid);
 
 end
