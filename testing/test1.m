@@ -4,7 +4,9 @@ clear; clc;
 close all
 
 addpath('./../src/')
+addpath('./../src/sampling/')
 addpath('./../ui/')
+addpath('./../ui/plotting')
 
 %load file
 data = open_profile();
