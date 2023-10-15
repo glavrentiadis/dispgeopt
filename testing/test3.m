@@ -140,8 +140,5 @@ for c = 1:size(flag_samp_cmp,2)
 end
 
 %tornado plot
-figid = figure;
-boxplot(cell2mat(disp_net'))
-grid on
-xticklabels(names_samp_cmp)
- 
+figid = plot_disp_unc_tornado(disp_net,names_samp_cmp);
+figid = plot_disp_unc_tornado2(disp_net,names_samp_cmp,[0.25,0.75],[0.02,0.25,0.75,0.98]);
