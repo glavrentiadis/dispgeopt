@@ -8,6 +8,6 @@ if nargin < 2; flag3D = false; end
 %rotation matrix
 rot_mat 	 = eye(2+flag3D);
 rot_mat(1:2,1:2) = [ cos(theta), sin(theta);
-           	    -sin(theta), cos(theta) ];
+           	        -sin(theta), cos(theta) ];
 
 end

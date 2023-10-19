@@ -16,15 +16,15 @@ addpath('./../ui/plotting')
 %plot data
 figid = plot_profile(data);
 %select edge points
-[prj1_data,figid] = select_points_side(data,'A',figid);
-[prj2_data,figid] = select_points_side(data,'B',figid);
+[prj1_data,~,figid] = select_points_side(data,'A',figid);
+[prj2_data,~,figid] = select_points_side(data,'B',figid);
 
 %select rupture point
 disp('Select rupture center point (left-click to select).');
 rup_loc_mean = zeros(2,1);
 [rup_loc_mean(1), rup_loc_mean(2)] = ginput(1); % User selects the center point for Line 3
 %azimuth angle and uncertainty
-[rup_azmth_mean,rup_azmth_std,rup_loc_std] = input_rupture(true);
+[rup_azmth_mean,rup_azmth_std,rup_loc_std] = input_rupture(1);
 close(figid)
 
 %number of samples
@@ -87,8 +87,9 @@ for c = 1:size(flag_samp_cmp,2)
         if ~mod(k,1000); fprintf('Processing iteration %i of %i ...\n',k,samp_n); end
         %sampling
         [prj1_samp, prj2_samp, rup_pt_samp{c}(k,:), rup_azmth_samp{c}(k), i_s1{c}{k}, i_s2{c}{k}]  = sample_unc_mc(flag_samp_c,prj1_data,prj2_data, ...
-                                                                                                                   rup_loc_mean,rup_azmth_mean,rup_loc_std, ...
-                                                                                                                   rup_azmth_std,nan,samp_p);
+                                                                                                                   rup_loc_mean,rup_loc_std, ...
+                                                                                                                   rup_azmth_mean,rup_azmth_std, ...
+                                                                                                                   samp_p);
         
         %compute projection;
         [prj1_c,prj1_v,prj1_tlim,prj1_fun{c}{k}] = projection_fit(prj1_samp); 

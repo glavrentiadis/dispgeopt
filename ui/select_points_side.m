@@ -1,13 +1,15 @@
-function [data_selected,figid] = select_points_side(data, side_name, figid)
+function [data_selected,side_idx,figid] = select_points_side(data, side_name, figid)
 %UI for selecting points for each side
 %
 % Input Arguments:
-%   data (mat[n_select,5]): geolocated points 
-%   figid (handle): figure handle for geolocated points 
-%   side_name (string): name for side to select points
+%   data          (mat[n_select,5]): geolocated points 
+%   side_name     (string): name for side to select points
+%   figid         (handle): figure handle for geolocated points 
 %
 % Output Arguments:
 %   data_selected (mat[n_select,5]): coordinates and uncertainty of selected points
+%   side_idx      (array[n_select):  indices of selected points
+%   figid         (handle):          figure handle 
 
 %default input
 if nargin < 2; side_name=''; end
@@ -15,10 +17,9 @@ if nargin < 3
     figid = plot_profile(data);
 end
 
-
-
 %prompt message
 fprintf('Select points for side %s (close or enter to exit, rigth click to remove)\n',side_name)
+title(sprintf('Select points for side %s:',side_name))
 %initalize coodinates
 x_reg = [];
 y_reg = [];
@@ -63,6 +64,7 @@ end
 
 %indicies of selected data
 i_in = inpolygon(data(:,1),data(:,2),x_reg,y_reg);
+side_idx = find(i_in);
 
 %selected data
 data_selected = data(i_in,:);

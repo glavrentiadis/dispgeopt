@@ -1,15 +1,16 @@
-function [side1_data,side2_data,rup_pt,azmth_angle,i_s1,i_s2] = sample_unc_mc(flag_samp,side1_data,side2_data,rup_pt,azmth_angle,rup_pt_unc,azmth_angle_unc,rup_lim,samp_pt_p)
+function [side1_data,side2_data,rup_pt,azmth_angle,i_s1,i_s2] = sample_unc_mc(flag_samp,side1_data,side2_data,rup_pt_mean,rup_pt_unc,azmth_angle_mean,azmth_angle_unc,samp_pt_p,rup_ax,rup_lim)
 % Sample input parameter uncertainty through monte carlo
 %
 % Input arguments:
 %   flag_samp
 %   side1_data
 %   side2_data
-%   rup_pt
-%   azmth_angle
-%   samp_pt_p
+%   rup_pt_mean
 %   rup_pt_unc
+%   azmth_angle_mean
 %   azmth_angle_unc
+%   samp_pt_p
+%   rup_ax
 %   rup_lim
 %
 % Output arguments:
@@ -22,10 +23,11 @@ function [side1_data,side2_data,rup_pt,azmth_angle,i_s1,i_s2] = sample_unc_mc(fl
 
 
 %default input
-if nargin < 6; rup_pt_unc      = 2.5;       end
-if nargin < 7; azmth_angle_unc = 5;         end
-if nargin < 8; rup_lim         = nan;       end
-if nargin < 9; samp_pt_p       = [0.8,0.8]; end
+if nargin < 6;  rup_pt_unc      = 2.5;       end
+if nargin < 7;  azmth_angle_unc = 5;         end
+if nargin < 8;  samp_pt_p       = [0.8,0.8]; end
+if nargin < 9;  rup_ax          = eye(2);    end
+if nargin < 10; rup_lim         = nan;       end
 
 %confirm sampling specifications
 assert(length(flag_samp)==5,'Invalid number of sampling options')
@@ -74,16 +76,22 @@ side2_data = side2_data(:,1:3);
 %sample rupture location
 if flag_samp(4)
     while true
-        %random
-        rup_pt = normrnd(rup_pt,rup_pt_unc);
+        %random variability
+        rup_pt = normrnd([0;0],rup_pt_unc);
+        %shift and rotation rupture point
+        rup_pt = rup_pt_mean + rup_ax * rup_pt;
         %exit if inside polygon
-        if isnan(rup_lim) || ~isempty( inpolygon(rup_pt(1),rup_pt(2),rup_lim(:,1),rup_lim(:,2)) ); break; end
+        if all(isnan(rup_lim),'all') || all( inpolygon(rup_pt(1),rup_pt(2),rup_lim(:,1),rup_lim(:,2)) ); break; end
     end
+else
+    rup_pt = rup_pt_mean;
 end
 
 %sample azimuth uncertainty
 if flag_samp(5)
-    azmth_angle = normrnd(azmth_angle,azmth_angle_unc);
+    azmth_angle = normrnd(azmth_angle_mean,azmth_angle_unc);
+else
+    azmth_angle = azmth_angle_mean;
 end
 
 end

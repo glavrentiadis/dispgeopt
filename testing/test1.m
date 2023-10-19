@@ -14,8 +14,8 @@ data = open_profile();
 %plot data
 figid = plot_profile(data);
 %select edge points
-[prj1_data,figid] = select_points_side(data,'A',figid);
-[prj2_data,figid] = select_points_side(data,'B',figid);
+[prj1_data,~,figid] = select_points_side(data,'A',figid);
+[prj2_data,~,figid] = select_points_side(data,'B',figid);
 
 %select rupture point
 disp('Select rupture center point (left-click to select).');

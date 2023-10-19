@@ -1,4 +1,4 @@
-function [rup_zone] = determine_rup_zone(s_param,s_c,s_v,thres)
+function [rup_zone,rup_pt,rup_ax] = determine_rup_zone(s_param,s_c,s_v,thres)
 % Determine rupture zone given far-field slip threshold
 %
 % Input Arguments:
@@ -9,6 +9,8 @@ function [rup_zone] = determine_rup_zone(s_param,s_c,s_v,thres)
 %
 % Output Arguments:
 %   rup_zone (max[2*n_pt,2]): rupture zone outline
+%   rup_pt (array[2]):        rupture center point
+%   rup_ax (array[2]):        rupture principal axes
 
 %number of points for slip desensitization
 n_pt = 50;
@@ -33,11 +35,19 @@ rz_ul(:,2) = slip_profile(rz_ul,s_param(1),0,s_param(3),s_param(4)+s_param(2),s_
 %rupture zone outline
 rup_zone = [rz_ll;rz_ul;rz_ll(1,:)];
 
+
 %rotation angles/matrix
-theta   = acos( dot(s_v,[1,0]) );
+theta =  atan2(s_v(2),s_v(1));
 rot_mat = axis_rot(-theta);
 
 %rotate and shift to orignial reference system
-rup_zone = rup_zone * rot_mat + s_c';
+rup_zone = rup_zone * rot_mat' + s_c';
+
+%rupture center point
+rup_pt = mean(rup_zone,1)';
+
+%rupture zone, principal axes
+rup_ax = [rz_max-rz_min,0;0,s_param(2)]; rup_ax =  sqrt(2)/norm(rup_ax) * rup_ax;
+rup_ax = rot_mat * rup_ax;
 
 end
