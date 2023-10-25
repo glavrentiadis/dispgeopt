@@ -33,8 +33,8 @@ df_disp_net   = summarize_disp_data(disp_net,   'disp_net',   [0.05,0.16,0.50,0.
 df_disp_horiz = summarize_disp_data(disp_horiz, 'disp_horiz', [0.05,0.16,0.50,0.84,0.95]);
 df_disp_vert  = summarize_disp_data(disp_vert,  'disp_vert',  [0.05,0.16,0.50,0.84,0.95]);
 df_disp       = [df_disp_net,df_disp_horiz,df_disp_vert];
-%save displacement statistics
-writetable(df_disp,[dir_out,prof_fname,'_summary_disp','.csv'])
+%save displacement statistic
+writetable(df_disp,[dir_out,prof_fname,'_summary_disp','.csv'],'WriteRowNames',true)
 %report 
 fprintf('Measured Displacement:\n')
 fprintf('\tNet (mean, std):\t %.2fm, %.2fm\n',        mean(disp_net),   std(disp_net))
