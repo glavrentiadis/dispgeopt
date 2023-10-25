@@ -33,7 +33,7 @@ for j = 1:n_iter
     [prj1_data,side1_idx{j},figid] = select_points_side(data,'A');
     pause(1); close(figid);
     [prj2_data,side2_idx{j},figid] = select_points_side(data,'B');
-    pause(); close(figid);
+    pause(1); close(figid);
 
     %figure selected points projections
     figid = plot_profile(data);
@@ -42,7 +42,7 @@ for j = 1:n_iter
     title(sprintf('%s: Selected projection points',prof_name))
     legend([hl1,hl2],{'Side A','Side B'},'Location','northeast')
     saveas(figid,[dir_fig,fname_prof_iter,'_select_points','.png'])
-    pause(); close(figid);
+    pause(1); close(figid);
 
     %select rupture point
     %method
@@ -58,7 +58,7 @@ for j = 1:n_iter
     %plot rupture location
     title('Rupture location')
     saveas(figid,[dir_fig,fname_prof_iter,'_rup_loc','.png'])
-    pause(); close(figid);
+    pause(1); close(figid);
 
     %azimuth angle
     prompt = {'Enter rupture azimuth angle:'};
@@ -91,8 +91,9 @@ for j = 1:n_iter
     hl5 = plot([prj1_pt(j,1),prj2_pt(j,1)],[prj1_pt(j,2),prj2_pt(j,2)],'-','Color',"#D95319",'LineWidth',2);
     title(sprintf('%s: Slip Measurement',prof_name))
     legend([hl5,hl1,hl3],{'Slip Measurement','Selected Points','Projection Lines'},'Location','northeast')
+    text(prj2_pt(j,1)+2,prj2_pt(j,2)+2,sprintf('Net:    %.2fm\nHoriz: %.2fm\nVert:   %.2fm',disp_net(j),disp_horiz(j),disp_vert(j)),'FontSize',12)
     saveas(figid,[dir_fig,fname_prof_iter,'_slip_measurement','.png'])
-    pause(); close(figid);
+    pause(2); close(figid);
 end
 
 %displacement measurement summary

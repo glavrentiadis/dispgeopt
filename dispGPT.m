@@ -38,9 +38,9 @@ if flag_analysis < 3
     writetable(df_disp,[dir_out,prof_fname,'_summary_disp','.csv'],'WriteRowNames',true)
     %report 
     fprintf('Measured Displacement:\n')
-    fprintf('\tNet (mean, min, max):\t %.2fm, %.2fm\n',        mean(disp_net),   min(disp_net),   max(disp_net))
-    fprintf('\tHorizontal (mean, min, max):\t %.2fm, %.2fm\n', mean(disp_horiz), min(disp_horiz), max(disp_horiz))
-    fprintf('\tVertical (mean, min, max):\t %.2fm, %.2fm\n',   mean(disp_vert),  min(disp_vert),  max(disp_vert))
+    fprintf('\tNet (mean, min, max):\t\t %.2fm, %.2fm, %.2fm\n',      mean(disp_net),   min(disp_net),   max(disp_net))
+    fprintf('\tHorizontal (mean, min, max):\t %.2fm, %.2fm, %.2fm\n', mean(disp_horiz), min(disp_horiz), max(disp_horiz))
+    fprintf('\tVertical (mean, min, max):\t %.2fm, %.2fm, %.2fm\n',   mean(disp_vert),  min(disp_vert),  max(disp_vert))
     
     %plot displacement distributions
     %net displacement
