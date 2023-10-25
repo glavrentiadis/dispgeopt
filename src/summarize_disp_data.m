@@ -9,6 +9,8 @@ if nargin < 3; prcnt    = (0.05:0.05:0.95); end
 disp_mean   = mean(disp_array);
 disp_median = median(disp_array);
 disp_std    = std(disp_array);
+disp_min    = min(disp_array);
+disp_max    = max(disp_array);
 %convert percentile to vector array
 prcnt = reshape(prcnt,length(prcnt),1);
 
@@ -18,8 +20,8 @@ disp_prcnt  = quantile(disp_array,prcnt);
 rname_prcnt = arrayfun(@(p) sprintf('prcnt_%2.u',round(p*100)), prcnt, 'UniformOutput',false);
 
 %summarize disp data
-df_disp = table([disp_mean;disp_median;disp_std;disp_prcnt], ...
+df_disp = table([disp_mean;disp_median;disp_std;disp_prcnt;disp_min;disp_max], ...
                 'VariableNames', {col_name}, ...
-                'RowNames', [{'mean','median','std'}';rname_prcnt]);
+                'RowNames', [{'mean','median','std','min','max'}';rname_prcnt]);
 
 end
