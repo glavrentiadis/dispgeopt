@@ -42,15 +42,17 @@ rot_mat = axis_rot(theta);
 
 %profile rotation
 disp_data_h = disp_data_h * rot_mat';
+%profile width
+d_width = max(disp_data_h(:,2)) - min(disp_data_h(:,2));
 
 %prifle function
 % parameter order: s0,disp,k,c0,c1,c2
-fun_prof = @(param,xdata) slip_profile(xdata,param(1),param(2),param(3),param(4),param(5),param(6));
+fun_prof = @(param,xdata) slip_profile_fun(xdata,param(1),param(2),param(3),param(4),param(5),param(6));
 
 %seed values, lower and upper bounds
-param_0  = [0,                         disp_data_h(end,2),  1,   0,   0,   0];
-param_lb = [min(disp_data_h(:,1)), min(disp_data_h(:,2)),  0,  -inf,-1,  -1];
-param_ub = [max(disp_data_h(:,1)), max(disp_data_h(:,2)),  inf,+inf, 1,  +1];
+param_0  = [0,                      disp_data_h(end,2),  1,   0,   0,   0];
+param_lb = [min(disp_data_h(:,1)), -d_width,             0,  -inf,-1,  -1];
+param_ub = [max(disp_data_h(:,1)), +d_width,             inf,+inf, 1,  +1];
 if ~any(isnan([side1_idx;side2_idx]))
     min_side1 = min( disp_data_h(side1_idx,1) );
     max_side1 = max( disp_data_h(side1_idx,1) ); 
@@ -70,7 +72,7 @@ switch flag_fit
     case 1
         %least squares fit
         lsq_opt = optimoptions('lsqcurvefit','Display','off');
-        param1 = lsqcurvefit(fun_prof,param_0,disp_data_h(:,1),disp_data_h(:,2),param_lb,param_ub,[],[],[],[],[],lsq_opt);
+        param = lsqcurvefit(fun_prof,param_0,disp_data_h(:,1),disp_data_h(:,2),param_lb,param_ub,[],[],[],[],[],lsq_opt);
     case 2
         %objective function
         fun_obj = @(param) norm(disp_data_h(:,2) - fun_prof(param,disp_data_h(:,1))) - lambda*param(3)^2 ;

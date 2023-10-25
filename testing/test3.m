@@ -3,15 +3,16 @@
 
 clear; clc; 
 close all
-
+%libraries
 addpath('./../src/')
 addpath('./../src/sampling/')
 addpath('./../ui/')
 addpath('./../ui/plotting')
 
-
 %load file
 [data,prof_name] = open_profile();
+%select output
+[dir_out,dir_fig] = select_output_folder();
 
 %plot data
 figid = plot_profile(data);
@@ -57,7 +58,6 @@ rup_pt_samp = cell(n_samp_cmp,1); rup_azmth_samp = cell(n_samp_cmp,1);
 prj1_pt = cell(n_samp_cmp,1); prj2_pt = cell(n_samp_cmp,3);
 %projection functions
 prj1_fun = cell(n_samp_cmp,1); prj2_fun = cell(n_samp_cmp,1);
-
 
 %iterate sampling components
 for c = 1:size(flag_samp_cmp,2)
@@ -117,29 +117,56 @@ for c = 1:size(flag_samp_cmp,2)
     % - - - - - - -
     %net displacement
     fig_title = {[prof_name,': net displacement'],['sampling: ',names_samp_cmp{c}]};
+    fig_name = ['slip_sensitivity_',prof_name,'_net_disp_samp_',names_samp_cmp{c}];
     figid = plot_disp_distribution(disp_net{c},fig_title);
+    saveas(figid,[dir_fig,fig_name,'.png'])
+    saveas(figid,[dir_fig,fig_name,'.pdf'])
     %horizontal displacement
     fig_title = {[prof_name,': horizontal displacement'],['sampling: ',names_samp_cmp{c}]};
+    fig_name = ['slip_sensitivity_',prof_name,'_net_disp_samp_',names_samp_cmp{c}];
     figid = plot_disp_distribution(disp_horiz{c},fig_title);
+    saveas(figid,[dir_fig,fig_name,'.png'])
+    saveas(figid,[dir_fig,fig_name,'.pdf'])
     %vertical displacement
     fig_title = {[prof_name,': vertical displacement'],['sampling: ',names_samp_cmp{c}]};
+    fig_name = ['slip_sensitivity_',prof_name,'_vert_disp_samp_',names_samp_cmp{c}];
     figid = plot_disp_distribution(disp_vert{c},fig_title);
-    
+    saveas(figid,[dir_fig,fig_name,'.png'])
+    saveas(figid,[dir_fig,fig_name,'.pdf'])
+
     % projection sampling
     % - - - - - - - 
     %plot percentile range (filled)
     fig_title = {[prof_name,': projection range'],['sampling: ',names_samp_cmp{c}]};
+    fig_name = ['slip_sensitivity_',prof_name,'_prj_range_samp_',names_samp_cmp{c}];
     figid = plot_profile_disp_quantile_range(disp_net{c},data,prj1_data,prj2_data,i_s1{c},i_s2{c},prj1_fun{c},prj2_fun{c},prj1_pt{c},prj2_pt{c});
     title(fig_title)
+    saveas(figid,[dir_fig,fig_name,'.png'])
+    saveas(figid,[dir_fig,fig_name,'.pdf'])
 
     % rupture sampling
     % - - - - - - - 
     fig_title = {[prof_name,': rupture sampling'],['sampling: ',names_samp_cmp{c}]};
+    fig_name = ['slip_sensitivity_',prof_name,'_rup_loc_samp_',names_samp_cmp{c}];
     figid = plot_profile_rupture_loc(data,rup_pt_samp{c},prj1_pt{c}(i_q50,:),prj2_pt{c}(i_q50,:), ...
                                      prj1_data,prj2_data,prj1_fun{c}{i_q50},prj2_fun{c}{i_q50});
     title(fig_title)
+    saveas(figid,[dir_fig,fig_name,'.png'])
+    saveas(figid,[dir_fig,fig_name,'.pdf'])
 end
 
 %tornado plot
+fig_title = {[prof_name,': net displacement'],['slip sensitivity']};
+fig_name = ['slip_sensitivity_',prof_name,'_net_disp','_tornado'];
 figid = plot_disp_unc_tornado(disp_net,names_samp_cmp);
+title(fig_title)
+saveas(figid,[dir_fig,fig_name,'.png'])
+saveas(figid,[dir_fig,fig_name,'.pdf'])
+
+fig_title = {[prof_name,': net displacement'],['slip sensitivity']};
+fig_name = ['slip_sensitivity_',prof_name,'_net_disp','_tornado2'];
 figid = plot_disp_unc_tornado2(disp_net,names_samp_cmp,[0.25,0.75],[0.02,0.25,0.75,0.98]);
+title(fig_title)
+saveas(figid,[dir_fig,fig_name,'.png'])
+saveas(figid,[dir_fig,fig_name,'.pdf'])
+

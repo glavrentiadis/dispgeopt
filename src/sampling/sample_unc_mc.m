@@ -2,16 +2,16 @@ function [side1_data,side2_data,rup_pt,azmth_angle,i_s1,i_s2] = sample_unc_mc(fl
 % Sample input parameter uncertainty through monte carlo
 %
 % Input arguments:
-%   flag_samp
-%   side1_data
-%   side2_data
-%   rup_pt_mean
-%   rup_pt_unc
-%   azmth_angle_mean
-%   azmth_angle_unc
-%   samp_pt_p
-%   rup_ax
-%   rup_lim
+%   flag_samp:          flag for uncertainty component samling
+%   side1_data (mat[n_s1,5]): coordinates and uncertainty for points of side A 
+%   side2_data  (mat[n_s2,5]): coordinates and uncertainty for points of side B 
+%   rup_pt_mean (array[2]): mean of rupture location
+%   rup_pt_unc (array[2]): ucertainty for rupture location
+%   azmth_angle_mean (double): mean azimuth angle
+%   azmth_angle_unc (doulbe): uncertainty of azimuth angle
+%   samp_pt_p (array[2]): projection points' sampling probability
+%   rup_ax (mat[2,2]): principal rupture axes
+%   rup_lim (mag[n_r,2]): rupture zone
 %
 % Output arguments:
 %   side1_data

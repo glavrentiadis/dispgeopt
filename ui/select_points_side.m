@@ -1,29 +1,29 @@
-function [data_selected,side_idx,figid] = select_points_side(data, side_name, figid)
+function [data_selected,side_idx,figid] = select_points_side(data, side_name)
 %UI for selecting points for each side
 %
 % Input Arguments:
 %   data          (mat[n_select,5]): geolocated points 
 %   side_name     (string): name for side to select points
-%   figid         (handle): figure handle for geolocated points 
 %
 % Output Arguments:
 %   data_selected (mat[n_select,5]): coordinates and uncertainty of selected points
 %   side_idx      (array[n_select):  indices of selected points
-%   figid         (handle):          figure handle 
+%   figid         (handle):          figure handle showing selected points
 
 %default input
 if nargin < 2; side_name=''; end
-if nargin < 3
-    figid = plot_profile(data);
-end
 
 %prompt message
-fprintf('Select points for side %s (close or enter to exit, rigth click to remove)\n',side_name)
-title(sprintf('Select points for side %s:',side_name))
+fprintf('Select points for side %s (close polygon or press enter to exit, rigth click to remove)\n',side_name)
 %initalize coodinates
 x_reg = [];
 y_reg = [];
 iter = 0;
+
+%create figure
+figid = plot_profile(data);
+title(sprintf('Select points for side %s:',side_name))
+
 %select region
 while true
     %record point
@@ -35,16 +35,20 @@ while true
     end
 
     %button options
-    if button == 1
+    if button == 1     %add new point
         x_reg = [x_reg;x];
         y_reg = [y_reg;y];
         iter  = iter + 1;
-    elseif button == 3;
+    elseif button == 3 %remove point
         [d_min,i_rm] = min(vecnorm([x_reg,y_reg]-[x,y],2,2));
         if d_min < 50
             x_reg = x_reg(1:end~=i_rm);
             y_reg = y_reg(1:end~=i_rm);
         end
+        close(figid);
+        %create new figure
+        figid = plot_profile(data); 
+        title(sprintf('Select points for side %s:',side_name))
     end
 
     %plot selection boundary

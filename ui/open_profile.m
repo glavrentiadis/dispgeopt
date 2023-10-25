@@ -15,7 +15,7 @@ f_ext = {'*.txt;*.csv', 'Slip Profile Files (*.txt,*.csv)'
          '*.*',         'All Files (*.*)'};
 
 %ui file selection 
-[fname, fpath] = uigetfile(f_ext, 'Select a profile file to open');
+[fname, fpath] = uigetfile(f_ext, 'Select Profile to Read');
 if fname == 0; error('User canceled the operation.'); end
 
 %profile name

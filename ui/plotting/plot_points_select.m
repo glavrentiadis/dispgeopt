@@ -1,4 +1,4 @@
-function [figid] = plot_points_select(data_select,figid,color,linestyle)
+function [figid,hl] = plot_points_select(data_select,figid,color,linestyle)
 % Plot selected points
 
 %default
@@ -8,6 +8,6 @@ if nargin < 4; linestyle = 'o';                       end
 
 %plot closed polygon and selected points
 figure(figid);
-plot(data_select(:,1),data_select(:,2),linestyle,'Color',color,'MarkerSize',15,'LineWidth',2)
+hl = plot(data_select(:,1),data_select(:,2),linestyle,'Color',color,'MarkerSize',15,'LineWidth',2);
 
 end
