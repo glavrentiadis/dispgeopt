@@ -1,12 +1,15 @@
-function [data,prof_name] = open_profile()
+function [data,prof_name] = open_profile(flag_sort)
 %UI to load slip profile
 %
 % Input Arguments:
-%   None
+%   flag_sort (boolean): sorting porfile on principal direction
 %
 % Output Arguments:
 %   data (mat[n_pt,5]): coordinates and uncertainty of profile's points
 %   prof_name (string): profile name
+
+%short input data
+if nargin < 1; flag_sort = false; end
 
 %file extension
 f_ext = {'*.txt;*.csv', 'Slip Profile Files (*.txt,*.csv)'
@@ -23,6 +26,7 @@ prof_name = fname(1:max(strfind(fname,'.'))-1);
 prof_name   = strrep(prof_name,'_',' ');
 
 %read profile
-data = read_profile(fullfile(fpath,fname));
+data = read_profile(fullfile(fpath,fname),flag_sort);
+
 
 end

@@ -1,4 +1,4 @@
-function [data] = remove_points(data,figid)
+function [data,figid] = remove_points(data,figid)
 %UI for selecting points for each side
 %
 % Input Arguments:
@@ -17,7 +17,7 @@ data_hist = {data};
 %select points to remove
 while true
     figid = plot_profile(data);
-    title('Select points to remove:')
+    title({'Select points to remove:','(rigth click to undo, space to reset, and enter to exit)'})
     %record point
     [x,y,button] = ginput(1);
 
