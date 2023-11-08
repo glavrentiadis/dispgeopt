@@ -37,7 +37,7 @@ while true
     elseif button == 3; %undo (right click)
         iter = iter - 1;
         data = data_hist{iter};
-    elseif button == 0; %reset (space bar)
+    elseif button == 32; %reset (space bar)
         iter = 1;
         data = data_hist{iter};
     end

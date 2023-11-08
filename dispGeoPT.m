@@ -43,7 +43,7 @@ if flag_analysis < 3
     %save displacement statistic
     writetable(df_disp,[dir_out,prof_fname,'_summary_disp','.csv'],'WriteRowNames',true)
     %report 
-    fprintf([repmat('=',1,80),'\n'])
+    fprintf([repmat('=',1,80),'\nProfile Name: %s\n\n'],prof_name)
     switch flag_analysis
         case 1
             fprintf('Measured Displacement:\n')

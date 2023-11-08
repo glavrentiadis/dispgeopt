@@ -2,12 +2,13 @@ function [disp_net,disp_horiz,disp_vert,apert_width,df_summary] = analysis_deter
 % Perform deterministic analysis determining slip diplacement
 
 %number of iterations
-prompt = {'Number of iterations:'};
-dlgtitle = 'Deterministic Iterations';
-dims = [1 35];
-definput = {'1'}; % Default iterations
-n_iter = inputdlg(prompt, dlgtitle, dims, definput);
-n_iter = str2double(n_iter{1});
+% prompt = {'Number of iterations:'};
+% dlgtitle = 'Deterministic Iterations';
+% dims = [1 35];
+% definput = {'1'}; % Default iterations
+% n_iter = inputdlg(prompt, dlgtitle, dims, definput);
+% n_iter = str2double(n_iter{1});
+n_iter = 100;
 
 %initialize arrays
 %displacement measurement
@@ -33,8 +34,10 @@ apert1_pt  = nan(n_iter,4);
 apert2_pt  = nan(n_iter,4);
 
 %iterate analyses
-for j = 1:n_iter
-    fprintf('%s: iteration %i of %i\n',prof_name,j,n_iter)
+% for j = 1:n_iter
+j = 1; flag2iter = true;
+while flag2iter
+    fprintf('%s: iteration %i\n',prof_name,j)
     fname_prof_iter = sprintf('%s_iter_%i',fname_prof_main,j);
 
     %select projection points
@@ -150,7 +153,45 @@ for j = 1:n_iter
     fprintf('\tDisplacement\n\t\tNet: %.2fm, Hozir: %.2fm, Vert: %.2fm\n',disp_net(j),disp_horiz(j),disp_vert(j))
     fprintf('\tAperture\n\t\tWidth: %.2fm\n',apert_width(j))
     fprintf([repmat('-',1,70),'\n'])
+
+    %termination options
+    answer = questdlg('Continue Processing?','Processing Options', ...
+	                  'Continue - keep profile','Continue - discard profile','Terminate - keep profile','Terminate - keep profile');
+    switch answer
+        case 'Continue - keep profile'
+            j = j + 1;
+        case 'Continue - discard profile'
+            continue
+        case 'Terminate - keep profile'
+            j = j + 1;
+            flag2iter = false;
+    end
 end
+
+%iterations to keep
+i2keep =~isnan(disp_net);
+n_iter = sum(i2keep);
+%displacement measurement
+disp_net   = disp_net(i2keep);
+disp_horiz = disp_horiz(i2keep);
+disp_vert  = disp_vert(i2keep);
+%point subset
+side1_idx = side1_idx(i2keep);
+side2_idx = side2_idx(i2keep);
+%rupture point and azimuth
+rup_loc   = rup_loc(i2keep,:);
+rup_azmth = rup_azmth(i2keep,:);
+%projection points
+prj1_pt = prj1_pt(i2keep,:);
+prj2_pt = prj2_pt(i2keep,:);
+%aperture width
+apert_width  = apert_width(i2keep);
+apert1_width = apert1_width(i2keep);
+apert2_width = apert2_width(i2keep);
+%aperture points
+apert_pt   = apert_pt(i2keep,:);
+apert1_pt  = apert1_pt(i2keep,:);
+apert2_pt  = apert2_pt(i2keep,:);
 
 %displacement measurement summary
 df_summary = array2table([(1:n_iter)', ...
