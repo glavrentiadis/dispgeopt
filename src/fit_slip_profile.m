@@ -1,4 +1,5 @@
-function [param,c_horiz,v_horiz,s_prof] = fit_slip_profile(disp_data,prj1_c,prj1_v,prj2_c,prj2_v,side1_idx,side2_idx,flag_fit,lambda)
+function [param,c_horiz,v_horiz,s_prof,s_pt] = fit_slip_profile(disp_data,prj1_c,prj1_v,prj2_c,prj2_v,side1_idx,side2_idx, ...
+                                                                flag_fit,lambda)
 % Fits raw profile to slip_profile analytical function 
 %   
 % Input Arguments:
@@ -17,6 +18,7 @@ function [param,c_horiz,v_horiz,s_prof] = fit_slip_profile(disp_data,prj1_c,prj1
 %   c_horiz (array[2]):           constant offset (slip profile - horizontal)
 %   v_horiz (array[2]):           projection vector (slip profile - horizontal)
 %   s_prof (mat[100,2]):          fitted slip profile
+%   s_pt (array[2]):              fitted rupture point
 
 %default input
 if nargin < 6; side1_idx = nan; end
@@ -43,16 +45,24 @@ rot_mat = axis_rot(theta);
 %profile rotation
 disp_data_h = disp_data_h * rot_mat';
 %profile width
-d_width = max(disp_data_h(:,2)) - min(disp_data_h(:,2));
+d_min = min(disp_data_h(:,2));
+d_max = max(disp_data_h(:,2));
+d_width = d_max - d_min;
+%disp values start and end of profile
+[s_str,j_s] = min(disp_data_h(:,1));
+d_str = disp_data_h(j_s,2);
+[~,j_e] = max(disp_data_h(:,1));
+d_end = disp_data_h(j_e,2);
 
-%prifle function
+%profile function
 % parameter order: s0,disp,k,c0,c1,c2
-fun_prof = @(param,xdata) slip_profile_fun(xdata,param(1),param(2),param(3),param(4),param(5),param(6));
+fun_prof = @(param,xdata) slip_profile_fun(xdata,param(1),param(2),param(3),param(4),param(5),param(6),s_str);
 
 %seed values, lower and upper bounds
-param_0  = [0,                      disp_data_h(end,2),  1,   0,   0,   0];
-param_lb = [min(disp_data_h(:,1)), -d_width,             0,  -inf,-1,  -1];
-param_ub = [max(disp_data_h(:,1)), +d_width,             inf,+inf, 1,  +1];
+dw_scl = 1;
+param_0  = [0.0,                    d_end-d_str,          1,   d_str,  0,   0];
+param_lb = [min(disp_data_h(:,1)), -dw_scl*d_width,       0.1, d_min, -1,  -1];
+param_ub = [max(disp_data_h(:,1)), +dw_scl*d_width,       inf, d_max,  1,  +1];
 if ~any(isnan([side1_idx;side2_idx]))
     min_side1 = min( disp_data_h(side1_idx,1) );
     max_side1 = max( disp_data_h(side1_idx,1) ); 
@@ -80,6 +90,7 @@ switch flag_fit
         fmin_opt = optimoptions('fmincon','Display','off');
         param = fmincon(fun_obj,param_0,[],[],[],[],param_lb,param_ub,[],fmin_opt);
 end
+param(7) = s_str; 
 
 %compute fit profile
 s_prof = linspace(min(disp_data_h(:,1)),max(disp_data_h(:,1)))';
@@ -87,5 +98,9 @@ s_prof(:,2) = fun_prof(param,s_prof);
 %rotate and shift to orignial reference system
 s_prof = s_prof / rot_mat' + c_horiz';
 
+%central rupture point
+s_pt = [param(1),fun_prof(param,param(1))];
+%rotate and shift to orignial reference system
+s_pt = s_pt / rot_mat' + c_horiz';
 
 end

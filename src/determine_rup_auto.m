@@ -1,4 +1,4 @@
-function [rup_loc_mean,rup_zone_lim,rup_ax,figid] = determine_rup_auto(data,prj1_data,prj2_data)
+function [rup_loc_mean,rup_zone_lim,rup_ax,figid] = determine_rup_auto(data,prj1_data,prj2_data,rup_azmth)
 % determine rupture location (automatic) given rupture slip threshold
 
 %rupture threshold
@@ -12,11 +12,14 @@ rup_thres = str2double(rup_thres{1});
 %compute projection;
 [prj1_c,prj1_v,~,~,prj1_fun] = projection_fit(prj1_data(:,1:3)); 
 [prj2_c,prj2_v,~,~,prj2_fun] = projection_fit(prj2_data(:,1:3)); 
+if dot(prj1_v,prj2_v) < 0; prj2_v =-1*prj2_v; end
 
 %fit analytic slip profile
-[sprof_param,sprof_c,sprof_v,sprof] = fit_slip_profile(data,prj1_c,prj1_v,prj2_c,prj2_v);
+[sprof_param,sprof_c,sprof_v,sprof,rup_loc1_mean] = fit_slip_profile(data,prj1_c,prj1_v,prj2_c,prj2_v);
 %determine rupture zone
-[rup_zone_lim, rup_loc_mean, rup_ax] = calc_rup_zone(sprof_param,sprof_c,sprof_v,rup_thres);
+[rup_zone_lim,rup_loc2_mean, rup_ax] = calc_rup_zone2(sprof_param,sprof_c,sprof_v,prj1_c,prj1_v,prj2_c,prj2_v,rup_azmth,rup_thres);
+%rupture location
+rup_loc_mean = rup_loc2_mean;
 
 %plot rupture zone
 figid = plot_profile(data);

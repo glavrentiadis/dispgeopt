@@ -1,6 +1,10 @@
 # Files to ignore it Git
 #----------------------------
 #Matlab
+#---   ---   ---   ---   ---
+#autosave files
 *.asv
+#optimization functions
+src/optimfun/
 
 
