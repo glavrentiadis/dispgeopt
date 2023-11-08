@@ -10,8 +10,8 @@ rup_thres = inputdlg(prompt, dlgtitle, dims, definput);
 rup_thres = str2double(rup_thres{1});
 
 %compute projection;
-[prj1_c,prj1_v,prj1_tlim,prj1_fun] = projection_fit(prj1_data(:,1:3)); 
-[prj2_c,prj2_v,prj2_tlim,prj2_fun] = projection_fit(prj2_data(:,1:3)); 
+[prj1_c,prj1_v,~,~,prj1_fun] = projection_fit(prj1_data(:,1:3)); 
+[prj2_c,prj2_v,~,~,prj2_fun] = projection_fit(prj2_data(:,1:3)); 
 
 %fit analytic slip profile
 [sprof_param,sprof_c,sprof_v,sprof] = fit_slip_profile(data,prj1_c,prj1_v,prj2_c,prj2_v);

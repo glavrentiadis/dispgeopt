@@ -1,5 +1,5 @@
 function [disp_net,disp_horiz,disp_vert,apert_width,df_summary] = analysis_deterministic(prof_name,fname_prof_main,data,dir_out,dir_fig)
-% 
+% Perform deterministic analysis determining slip diplacement
 
 %number of iterations
 prompt = {'Number of iterations:'};
@@ -52,8 +52,7 @@ for j = 1:n_iter
     saveas(figid,[dir_fig,fname_prof_iter,'_select_points','.png'])
     pause(1); close(figid);
 
-    %select rupture point
-    %method
+    %select rupture point method
     [flag_rup_pt] = listdlg('ListString',{'Manual','Auto'}, ...
                             'PromptString','Determine rupture location:','Name','Rupture Location', ...
                             'SelectionMode','single','ListSize',[250,100]);
@@ -77,8 +76,10 @@ for j = 1:n_iter
     rup_azmth(j) = str2double(azimuth_input{1});
 
     %compute projection;
-    [prj1_c,prj1_v,prj1_tlim,prj1_fun] = projection_fit(prj1_data(:,1:3)); 
-    [prj2_c,prj2_v,prj2_tlim,prj2_fun] = projection_fit(prj2_data(:,1:3)); 
+    [prj1_c,prj1_v,~,~,prj1_fun] = projection_fit(prj1_data(:,1:3)); 
+    [prj2_c,prj2_v,~,~,prj2_fun] = projection_fit(prj2_data(:,1:3)); 
+    %rotate second side projection if points in oposite direction
+    if dot(prj1_v,prj2_v) < 0; prj2_v =-1*prj2_v; end
     %average projecton
     prj_c = mean([prj1_c,prj2_c],2);
     prj_v = mean([prj1_v,prj2_v],2); 
@@ -122,7 +123,7 @@ for j = 1:n_iter
     [figid,hl3] = plot_prj_line(prj1_fun,figid);
     [figid,hl4] = plot_prj_line(prj2_fun,figid);
     hl5 = plot([prj1_pt(j,1),prj2_pt(j,1)],[prj1_pt(j,2),prj2_pt(j,2)],'-','Color',"#D95319",'LineWidth',2);
-    apert_win2plot = [apert_win(:,1:2);flipud(apert_win(:,3:4));apert_win(:,1:2)];
+    apert_win2plot = [apert_win(:,1:2);flipud(apert_win(:,3:4));apert_win(1,1:2)];
     hl6 = plot(apert_win2plot(:,1), apert_win2plot(:,2),  ':','Color',[0 0.5 0],'LineWidth',3);
     title(sprintf('%s: Slip & Aperture',prof_name))
     legend([hl5,hl6,hl1,hl3],{'Slip Measurement','Aperture','Selected Points','Projection Lines'},'Location','northeast')
@@ -139,11 +140,13 @@ for j = 1:n_iter
 end
 
 %displacement measurement summary
-df_summary = array2table([disp_net,disp_horiz,disp_vert,...
+df_summary = array2table([(1:n_iter)', ...
+                          disp_net,disp_horiz,disp_vert,...
                           apert_width,apert1_width,apert2_width, ...
                           rup_loc,rup_azmth,prj1_pt,prj2_pt,], ...
                          'VariableNames', ...
-                         {'disp_net','disp_horiz','disp_vert', ...
+                         {'iter', ...
+                         'disp_net','disp_horiz','disp_vert', ...
                           'apert_width_cent','apert_width_sideA','apert_width_sideB', ...
                           'rup_loc_X','rup_loc_Y','rup_azmth', ...
                           'prj_pt_sideA_X','prj_pt_sideA_Y','prj_pt_sideA_Z',...

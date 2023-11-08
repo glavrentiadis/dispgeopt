@@ -4,6 +4,7 @@ function dispGPT()
 %libraries
 addpath('./src/')
 addpath('./src/sampling/')
+addpath('./src/optimfun/')
 addpath('./ui/')
 addpath('./ui/plotting')
 
@@ -27,7 +28,7 @@ switch flag_analysis
     case 1
         [disp_net,disp_horiz,disp_vert,apert_width,df_summary] = analysis_deterministic(prof_name,prof_fname,data,dir_out,dir_fig);
     case 2
-
+        [disp_net,disp_horiz,disp_vert,apert_width,df_summary] = analysis_probabilistic(prof_name,prof_fname,data,dir_out,dir_fig);
     case 3
         
 end
@@ -43,11 +44,16 @@ if flag_analysis < 3
     writetable(df_disp,[dir_out,prof_fname,'_summary_disp','.csv'],'WriteRowNames',true)
     %report 
     fprintf([repmat('=',1,80),'\n'])
-    fprintf('Measured Displacement:\n')
-    fprintf('\tNet (mean, min, max):\t\t %.2fm, %.2fm, %.2fm\n',           mean(disp_net),    min(disp_net),    max(disp_net))
-    fprintf('\tHorizontal (mean, min, max):\t %.2fm, %.2fm, %.2fm\n',      mean(disp_horiz),  min(disp_horiz),  max(disp_horiz))
-    fprintf('\tVertical (mean, min, max):\t %.2fm, %.2fm, %.2fm\n',        mean(disp_vert),   min(disp_vert),   max(disp_vert))
-    fprintf('Aperture\n\tWdith (mean, min, max):\t %.2fm, %.2fm, %.2fm\n', mean(apert_width), min(apert_width), max(apert_width))
+    switch flag_analysis
+        case 1
+            fprintf('Measured Displacement:\n')
+            fprintf('\tNet (mean, min, max):\t\t %.2fm, %.2fm, %.2fm\n',           mean(disp_net),    min(disp_net),    max(disp_net))
+            fprintf('\tHorizontal (mean, min, max):\t %.2fm, %.2fm, %.2fm\n',      mean(disp_horiz),  min(disp_horiz),  max(disp_horiz))
+            fprintf('\tVertical (mean, min, max):\t %.2fm, %.2fm, %.2fm\n',        mean(disp_vert),   min(disp_vert),   max(disp_vert))
+            fprintf('Aperture\n\tWdith (mean, min, max):\t %.2fm, %.2fm, %.2fm\n', mean(apert_width), min(apert_width), max(apert_width))
+        case 2
+
+    end
     fprintf([repmat('=',1,80),'\n'])
 
     %plot displacement distributions

@@ -57,7 +57,7 @@ prj1_fun = cell(samp_n,1);
 prj2_fun = cell(samp_n,1);
 
 
-%sampler
+%uncertainty sampler
 for k = 1:samp_n
     if ~mod(k,1000); fprintf('Processing iteration %i of %i ...\n',k,samp_n); end
     %sampling

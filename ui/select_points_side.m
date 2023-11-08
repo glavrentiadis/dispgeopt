@@ -22,7 +22,7 @@ iter = 0;
 
 %create figure
 figid = plot_profile(data);
-title(sprintf('Select points for side %s:',side_name))
+title({sprintf('Select points for side %s:',side_name),'(close polygon or press enter to exit, rigth click to remove)'})
 
 %select region
 while true

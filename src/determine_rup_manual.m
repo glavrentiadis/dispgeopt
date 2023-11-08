@@ -2,8 +2,8 @@ function [rup_loc_mean,rup_zone_lim,rup_ax,figid] = determine_rup_manual(data,pr
 % user selection of rupture location
 
 %compute projection;
-[prj1_c,prj1_v,prj1_tlim,prj1_fun] = projection_fit(prj1_data(:,1:3)); 
-[prj2_c,prj2_v,prj2_tlim,prj2_fun] = projection_fit(prj2_data(:,1:3)); 
+[prj1_c,prj1_v,~,prj1_tlim,prj1_fun] = projection_fit(prj1_data(:,1:3)); 
+[prj2_c,prj2_v,~,prj2_tlim,prj2_fun] = projection_fit(prj2_data(:,1:3)); 
 
 %plot rupture data
 figid = plot_profile(data);
