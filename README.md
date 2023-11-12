@@ -1,5 +1,6 @@
 # dispGeoPT
-Matlab script to characterize displacement slip profiles from geolocated points
+## Description
+Matlab script to characterize displacement (mean and uncertainty distribution) of slip profiles from geolocated points.
 
 Computes:
 * net, horizontal, and vertical displacement components
@@ -7,8 +8,11 @@ Computes:
 * aperture width
 
 Uncertainty quantification from:
+* projection window width
+* projection point sampling distribution
 * projection points' location uncertainty
-* projection width
 * rupture location
 * rupture azimuth
 
+## Acknowledgment
+Developed in collaboration with Chris Duross, Domniki Asimaki, Ben Masson, Alex Hetham, Nadine Reitman, and Chris Milliner
