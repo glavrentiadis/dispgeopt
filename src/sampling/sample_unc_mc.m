@@ -28,8 +28,8 @@ function [side1_data,side2_data,rup_pt,azmth_angle,i_s1,i_s2] = sample_unc_mc(fl
 %   i_s2 (array[n_s2']):        indices of side B selected points
 
 % flag sampling positions
-%   1: projection points
-%   2: projection window
+%   1: projection window
+%   2: projection points
 %   3: horizontal location
 %   4: vertical location
 %   5: rupture location
@@ -46,47 +46,54 @@ if nargin < 11; rup_lim         = nan;       end
 %confirm sampling specifications
 assert(length(flag_samp)==6,'Invalid number of sampling options')
 
-%sample data point populations
+%sample windowed data point populations
+i_count = 1;
 if flag_samp(1)
     while true
         %window size
-        wsize = normrnd(winsize_info(1),winsize_info(2));
+        wsize = abs(normrnd(winsize_info(1),winsize_info(2)));
         wsize = max(wsize, 0);
     
         %window position (side A)
-        s1_mp = max(side1_data(:,6)) * rand();
-        s1_ws = s1_mp - wsize/2;
-        s1_we = s1_mp + wsize/2;
+        s1_ws = (max(side1_data(:,6)) - wsize) * rand();
+        s1_we = s1_mp + wsize;
         %window position (side A)
-        s2_mp = max(side2_data(:,6)) * rand();
-        s2_ws = s2_mp - wsize/2;
-        s2_we = s2_mp + wsize/2;
+        s2_ws = (max(side2_data(:,6)) - wsize) * rand();
+        s2_we = s2_mp + wsize;
 
         %points
-        i_s1 = and(s1_ws >= side1_data(:,6), side1_data(:,6) <= s1_we);
-        i_s2 = and(s2_ws >= side2_data(:,6), side2_data(:,6) <= s2_we);
-        if length(i_s1)>=4 && length(i_s2)>=4; break; end
+        i_s1 = and(s1_ws <= side1_data(:,6), side1_data(:,6) <= s1_we);
+        i_s2 = and(s2_ws <= side2_data(:,6), side2_data(:,6) <= s2_we);
+        if sum(i_s1)>=4 && sum(i_s2)>=4; break; end
     end
+    i_count = i_count+1;
+    if mod(i_count,100)==0; warning('Multiple iterations on windowing projection points degrading performance.'); end
 else
-    i_s1 = (1:size(side1_data,1))';
-    i_s2 = (1:size(side2_data,1))';
+    i_s1 = true(size(side1_data,1),1);
+    i_s2 = true(size(side2_data,1),1);
 end
 
 %sample data point populations
+i_count = 1;
 if flag_samp(2)
     %data points to select
     while true
-        i_s1 = find( binornd(true,samp_pt_p(1)*ones(size(side1_data,1),1)) );
-        if length(i_s1)>=4; break; end
+        i_s1 = and(i_s1, binornd(true,samp_pt_p(1)*ones(size(side1_data,1),1)) );
+        if length(i_s1)>=3; break; end
     end
     while true
-        i_s2 = find( binornd(true,samp_pt_p(2)*ones(size(side2_data,1),1)) );
-        if length(i_s2)>=4; break; end
+        i_s2 = and(i_s2, binornd(true,samp_pt_p(2)*ones(size(side2_data,1),1)) );
+        if length(i_s2)>=3; break; end
     end
+    i_count = i_count+1;
+    if mod(i_count,100)==0; warning('Multiple iterations on independent sampling projection points degrading performance.'); end
 else
-    i_s1 = (1:size(side1_data,1))';
-    i_s2 = (1:size(side2_data,1))';
+    i_s1 = and(i_s1, true(size(side1_data,1),1) );
+    i_s2 = and(i_s2, true(size(side2_data,1),1) );
 end
+%convert logic array to indices
+i_s1 = find(i_s1);
+i_s2 = find(i_s2);
 %data downsampling
 side1_data = side1_data(i_s1,:);
 side2_data = side2_data(i_s2,:);
