@@ -1,4 +1,4 @@
-function [figid] = plot_disp_unc_tornado2(disp_data,names_data,q4eval,q2plot,color)
+function [figid,rank_unc_idx] = plot_disp_unc_tornado2(disp_data,names_data,q4eval,q2plot,color)
 % Tornado plot on given quantiles
 
 %default inputs
@@ -64,5 +64,8 @@ yticks(1:n_d)
 ylim([0,n_d+1])
 yticklabels(names_data(i_rnk))
 xlabel('Displacment (m)')
+
+%rank components from biggest to smallest
+rank_unc_idx = fliplr(reshape(i_rnk,1,[]));
 
 end

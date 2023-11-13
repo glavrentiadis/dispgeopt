@@ -1,5 +1,8 @@
-function [disp_net,disp_horiz,disp_vert,apert_width,df_summary] = analysis_deterministic(prof_name,fname_prof_main,data,dir_out,dir_fig)
+function [disp_net,disp_horiz,disp_vert,apert_width,df_summary,fname_prof_main] = analysis_deterministic(prof_name,fname_prof_main,data,dir_out,dir_fig)
 % Perform deterministic analysis determining slip diplacement
+
+%profile and analysis name
+fname_prof_main = sprintf('%s_deterministic_analysis',fname_prof_main);
 
 %number of iterations
 % prompt = {'Number of iterations:'};
@@ -53,6 +56,7 @@ while flag2iter
     title(sprintf('%s: Selected projection points',prof_name))
     legend([hl1,hl2],{'Side A','Side B'},'Location','northeast')
     saveas(figid,[dir_fig,fname_prof_iter,'_select_points','.png'])
+    savefig(figid,[dir_fig,fname_prof_iter,'_select_points','.fig'])
     pause(1); close(figid);
 
     %azimuth angle
@@ -63,32 +67,12 @@ while flag2iter
     azimuth_input = inputdlg(prompt, dlgtitle, dims, definput);
     rup_azmth(j) = str2double(azimuth_input{1});
 
-    %select rupture point method
-    [flag_rup_pt] = listdlg('ListString',{'Manual','Auto'}, ...
-                            'PromptString','Determine rupture location:','Name','Rupture Location', ...
-                            'SelectionMode','single','ListSize',[250,100]);
-    while true
-        switch flag_rup_pt
-            case 1 %manual
-                [rup_loc(j,:),rup_zone_lim,rup_ax,figid] = determine_rup_manual(data,prj1_data,prj2_data);
-                break
-            case 2 %automatic
-                [rup_loc(j,:),rup_zone_lim,rup_ax,figid] = determine_rup_auto(data,prj1_data,prj2_data,rup_azmth(j));
-                %check results validity
-                title({'Rupture location','(Enter, scape, or right click to accept, Esc to use manual approach)'})
-                %record input
-                [~,~,button] = ginput(1);
-                if any([isempty(button), button==32, button==1])
-                    break
-                else
-                    flag_rup_pt = 1;
-                    close(figid);
-                end
-        end
-    end
+    %select rupture location
+    [rup_loc(j,:),rup_zone_lim,rup_ax,figid] = select_rup(data,prj1_data,prj2_data,rup_azmth(j));
     %plot rupture location
-    title('Rupture location')
+    title(sprintf('%s: Rupture location (mean)',prof_name))
     saveas(figid,[dir_fig,fname_prof_iter,'_rup_loc','.png'])
+    savefig(figid,[dir_fig,fname_prof_iter,'_rup_loc','.fig'])    
     pause(1); close(figid);
 
     %compute projection;
@@ -129,6 +113,7 @@ while flag2iter
     % text(prj2_pt(j,1)+2,prj2_pt(j,2)+2,anot_txt,'FontSize',12)
     annotation('textbox',[0.15,0.05,0.15,0.2],'String',anot_txt,'FitBoxToText','on','FontSize',12,'BackgroundColor','w','FaceAlpha',1);
     saveas(figid,[dir_fig,fname_prof_iter,'_slip_measurement','.png'])
+    savefig(figid,[dir_fig,fname_prof_iter,'_slip_measurement','.fig'])
     pause(2); close(figid);
 
     %plot displacement aperture
@@ -147,12 +132,13 @@ while flag2iter
     % text(prj2_pt(j,1)+2,prj2_pt(j,2)+2,anot_txt,'FontSize',12)
     annotation('textbox',[0.15,0.08,0.15,0.2],'String',anot_txt,'FitBoxToText','on','FontSize',12,'BackgroundColor','w','FaceAlpha',1);
     saveas(figid,[dir_fig,fname_prof_iter,'_slip_aperture','.png'])
+    savefig(figid,[dir_fig,fname_prof_iter,'_slip_aperture','.fig'])
     pause(2); close(figid);
 
     %summary displacement
+    fprintf([repmat('-',1,70),'\n'])
     fprintf('\tDisplacement\n\t\tNet: %.2fm, Hozir: %.2fm, Vert: %.2fm\n',disp_net(j),disp_horiz(j),disp_vert(j))
     fprintf('\tAperture\n\t\tWidth: %.2fm\n',apert_width(j))
-    fprintf([repmat('-',1,70),'\n'])
 
     %termination options
     answer = questdlg('Continue Processing?','Processing Options', ...

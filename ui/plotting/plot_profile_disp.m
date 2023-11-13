@@ -12,11 +12,11 @@ if nargin < 10
     figid = plot_profile(data,figid);
 end
 %plot selected points for projections
-figid = plot_points_select(prj1_data,figid);
-figid = plot_points_select(prj2_data,figid);
+if ~isempty(prj1_data); figid = plot_points_select(prj1_data,figid); end
+if ~isempty(prj2_data); figid = plot_points_select(prj2_data,figid); end
 %plot projection points
-figid = plot_prj_line(prj1_fun,figid);
-figid = plot_prj_line(prj2_fun,figid);
+if ~isempty(prj1_fun); figid = plot_prj_line(prj1_fun,figid); end
+if ~isempty(prj2_fun); figid = plot_prj_line(prj2_fun,figid); end
 %plot displacment
 plot([prj1_pt(1),prj2_pt(1)],[prj1_pt(2),prj2_pt(2)],linestyle,'Color',color,'LineWidth',2);
 

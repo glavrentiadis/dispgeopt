@@ -1,4 +1,4 @@
-function [flag_samp,names_samp] = input_uncertainty_opt(flag_rup_unc)
+function [flag_samp,names_samp,list_opt] = input_uncertainty_opt(flag_rup_unc)
 % List UI to select uncertainty options
 
 %default input
@@ -8,7 +8,7 @@ if nargin < 1; flag_rup_unc = true; end
 dlgtitle  = 'Uncertainty Options';
 dlgprompt = 'Select uncertainty components:';
 %uncertainty options
-list_opt = {'Projection Points';'Projection Window';'Horizontal Location';'Vertical Location';'Rupture Location';'Rupture Azimuth'};
+list_opt = {'Projection Window';'Projection Points';'Horizontal Location';'Vertical Location';'Rupture Location';'Rupture Azimuth'};
 
 %input rupture uncertainty
 if ~flag_rup_unc; list_opt = list_opt(1:4); end
@@ -22,7 +22,9 @@ flag_samp = false(1,6);
 %update selection
 if tf; flag_samp(indx) = true; end
 
-%names of 
+%names of selected uncertainty options
 names_samp = list_opt(flag_samp);
+%names of selected uncertainty options
+list_opt = list_opt';
 
 end

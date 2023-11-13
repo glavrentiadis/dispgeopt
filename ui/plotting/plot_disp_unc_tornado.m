@@ -1,4 +1,4 @@
-function [figid, i_rnk] = plot_disp_unc_tornado(disp_data,names_data)
+function [figid,rank_unc_idx] = plot_disp_unc_tornado(disp_data,names_data)
 % Tornado plot based on box-chart port
 
 %quantiles box plot
@@ -32,5 +32,8 @@ set(hl,{'linew','color'},{1.5,'k'})
 grid on
 yticklabels(names_data(i_rnk))
 xlabel('Displacment (m)')
+
+%rank components from biggest to smallest
+rank_unc_idx = fliplr(reshape(i_rnk,1,[]));
 
 end
