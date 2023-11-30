@@ -26,7 +26,7 @@ switch flag_unc
     case 1 %azimuth angle w\o uncertainty
         prompt   = {'Enter rupture azimuth angle (deg):';
                     'Enter rupture azimuth uncertainty (deg):'};
-        definput = {'45.0','5.0'};
+        definput = {'45.0','2.5'};
         dims     = [1, 45; 1, 45];
         inpt     = inputdlg(prompt, dlgtitle, dims, definput);
         rup_azmth_mean = str2double(inpt{1});

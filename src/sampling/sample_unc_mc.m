@@ -52,7 +52,7 @@ if flag_samp(1)
     while true
         %window size
         wsize = abs(normrnd(winsize_info(1),winsize_info(2)));
-        wsize = max(wsize, 0);
+        wsize = max(wsize, 1);
     
         %window position (side A)
         s1_ws = (max(side1_data(:,6)) - wsize) * rand();
@@ -64,7 +64,7 @@ if flag_samp(1)
         %points
         i_s1_stp1 = and(s1_ws <= side1_data(:,6), side1_data(:,6) <= s1_we);
         i_s2_stp1 = and(s2_ws <= side2_data(:,6), side2_data(:,6) <= s2_we);
-        if sum(i_s1_stp1)>=4 && sum(i_s2_stp1)>=4; break; end
+        if sum(i_s1_stp1)>=min(4,length(i_s1_stp1)) && sum(i_s2_stp1)>=min(4,length(i_s2_stp1)); break; end
         
         %warning multiple iterations
         i_count = i_count+1;
@@ -81,14 +81,14 @@ if flag_samp(2)
     %data points to select
     while true
         i_s1 = and(i_s1_stp1, binornd(true,samp_pt_p(1)*ones(size(side1_data,1),1)) );
-        if sum(i_s1)>=3; break; end
+        if sum(i_s1)>=min(3,length(i_s1)); break; end
         %warning multiple iterations
         i_count = i_count+1;
         if mod(i_count,1000)==0; warning('Multiple iterations on independent sampling projection points degrading performance.'); end
     end
     while true
         i_s2 = and(i_s2_stp1, binornd(true,samp_pt_p(2)*ones(size(side2_data,1),1)) );
-        if sum(i_s2)>=3; break; end
+        if sum(i_s2)>=min(3,length(i_s2)); break; end
         %warning multiple iterations
         i_count = i_count+1;
         if mod(i_count,1000)==0; warning('Multiple iterations on independent sampling projection points degrading performance.'); end

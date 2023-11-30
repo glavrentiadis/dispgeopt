@@ -32,6 +32,9 @@ saveas(figid,[dir_fig,fname_prof_main,'_select_points','.png'])
 savefig(figid,[dir_fig,fname_prof_main,'_select_points','.fig'])
 pause(1); close(figid);
 
+%main projection window 
+[~,prc_v_main,~,~,~] = projection_fit(prj1_data(:,1:2));
+
 %projection window size
 if flag_samp(1)
     winsize_info = input_prjwinsize();
@@ -48,7 +51,7 @@ end
 
 %projection points sampling info
 if flag_samp(2); samp_p = input_probsamp();
-else             samp_p = [1,1];
+else             samp_p = [1,1]';
 end
 
 %azimuth angle uncertainty
@@ -132,7 +135,7 @@ for c = 1:size(flag_samp_cmp,2)
     fname_prof_samp = sprintf('%s_samp_%s',fname_prof_main,strrep( lower(names_samp{c}), ' ', '_') );
     title_samp = sprintf('Sampling: %s',names_samp{c});
     %uncertainty sampler
-    jj = 1;
+    jj = 0;
     for j = 1:n_samp
         if ~mod(j,1000); fprintf('Processing iteration %i of %i ...\n',j,n_samp); end
         %sampling
@@ -146,7 +149,18 @@ for c = 1:size(flag_samp_cmp,2)
         [prj1_c,prj1_v,~,~,prj1_fun{c}{j}] = projection_fit(prj1_samp{c}{j}); 
         [prj2_c,prj2_v,~,~,prj2_fun{c}{j}] = projection_fit(prj2_samp{c}{j});
         %rotate second side projection if points in oposite direction
-        if dot(prj1_v,prj2_v) < 0; prj2_v =-1*prj2_v; end
+        %first component
+        if dot(prc_v_main,prj1_v) < 0
+            prj1_v =-1*prj1_v;
+            %update projection function
+            prj1_fun{j} = @(t) (prj1_c + prj1_v*t)';
+        end
+        %second component
+        if dot(prc_v_main,prj2_v) < 0
+            prj2_v =-1*prj2_v;
+            %update projection function
+            prj2_fun{j} = @(t) (prj2_c + prj2_v*t)';
+        end
         %average projecton
         prj_c = mean([prj1_c,prj2_c],2);
         prj_v = mean([prj1_v,prj2_v],2); 
@@ -221,8 +235,8 @@ for c = 1:size(flag_samp_cmp,2)
     [figid,hl1,hl2] = plot_profile_disp_quantile_range(disp_net{c},data,prj1_fun{c},prj2_fun{c},prj1_pt{c},prj2_pt{c},quantiles,color);
     legend(fliplr(hl1),{'Median Net Displacement','2-98% Percentile Net Displacement'})
     title({sprintf('%s: Uncertainty Range',prof_name),title_samp})
-    saveas(figid,[dir_fig,fname_prof_samp,'_qantile_samp','.png'])
-    savefig(figid,[dir_fig,fname_prof_samp,'_qantile_samp','.fig'])
+    saveas(figid,[dir_fig,fname_prof_samp,'_quantile_samp','.png'])
+    savefig(figid,[dir_fig,fname_prof_samp,'_quantile_samp','.fig'])
     pause(1); close(figid);
     
     %plot rupture location sampling

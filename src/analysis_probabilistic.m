@@ -26,6 +26,9 @@ saveas(figid,[dir_fig,fname_prof_main,'_select_points','.png'])
 savefig(figid,[dir_fig,fname_prof_main,'_select_points','.fig'])
 pause(1); close(figid);
 
+%main projection window 
+[~,prc_v_main,~,~,~] = projection_fit(prj1_data(:,1:2));
+
 %projection window size
 if flag_samp(1)
     winsize_info = input_prjwinsize();
@@ -42,7 +45,7 @@ end
 
 %projection points sampling info
 if flag_samp(2); samp_p = input_probsamp();
-else             samp_p = [1,1];
+else             samp_p = [1,1]';
 end
 
 %azimuth angle uncertainty
@@ -96,7 +99,7 @@ apert1_pt = nan(n_samp,4);
 apert2_pt = nan(n_samp,4);
 
 %uncertainty sampler
-jj = 1;
+jj = 0;
 for j = 1:n_samp
     if ~mod(j,1000); fprintf('Processing iteration %i of %i ...\n',j,n_samp); end
     %sampling
@@ -110,7 +113,18 @@ for j = 1:n_samp
     [prj1_c,prj1_v,~,~,prj1_fun{j}] = projection_fit(prj1_samp{j}); 
     [prj2_c,prj2_v,~,~,prj2_fun{j}] = projection_fit(prj2_samp{j});
     %rotate second side projection if points in oposite direction
-    if dot(prj1_v,prj2_v) < 0; prj2_v =-1*prj2_v; end
+    %first component
+    if dot(prc_v_main,prj1_v) < 0
+        prj1_v =-1*prj1_v;
+        %update projection function
+        prj1_fun{j} = @(t) (prj1_c + prj1_v*t)';
+    end
+    %second component
+    if dot(prc_v_main,prj2_v) < 0
+        prj2_v =-1*prj2_v;
+        %update projection function
+        prj2_fun{j} = @(t) (prj2_c + prj2_v*t)';
+    end
     %average projecton
     prj_c = mean([prj1_c,prj2_c],2);
     prj_v = mean([prj1_v,prj2_v],2); 
@@ -186,8 +200,8 @@ color     = {"#77AC30","#0072BD"};
 [figid,hl1,hl2] = plot_profile_disp_quantile_range(disp_net,data,prj1_fun,prj2_fun,prj1_pt,prj2_pt,quantiles,color);
 legend(fliplr(hl1),{'Median Net Displacement','2-98% Percentile Net Displacement'})
 title(sprintf('%s: Uncertainty Range',prof_name))
-saveas(figid,[dir_fig,fname_prof_main,'_qantile_samp','.png'])
-savefig(figid,[dir_fig,fname_prof_main,'_qantile_samp','.fig'])
+saveas(figid,[dir_fig,fname_prof_main,'_quantile_samp','.png'])
+savefig(figid,[dir_fig,fname_prof_main,'_quantile_samp','.fig'])
 pause(1); close(figid);
 
 %plot rupture location sampling

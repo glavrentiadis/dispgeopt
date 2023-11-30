@@ -8,7 +8,7 @@ function [samp_p] = input_probsamp()
 dlgtitle = 'Projection Point Input';
 prompt = {'Sampling probability (side A):';'Sampling probability (side B):'};
 dims   = [1 35; 1 35];
-definput = {'0.8';'0.8'};
+definput = {'0.9';'0.9'};
 %projection point sampling dialog
 samp_p = inputdlg(prompt, dlgtitle, dims, definput);
 samp_p = cellfun(@(x) str2double(x), samp_p(1:2));

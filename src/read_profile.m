@@ -1,4 +1,4 @@
-function [data] = read_profile(fname_prof,flag_sort)
+function [data,name_prof] = read_profile(fname_prof,flag_sort)
 % Reads input file of gedolocated points defining the slip profile
 %
 % Input Arguments:
@@ -7,6 +7,7 @@ function [data] = read_profile(fname_prof,flag_sort)
 %
 % Output Arguments:
 %   data (mat[n_pt,5]): coordinates and uncertainty of profile's points
+%   name_prof (string): profile name
 %
 % Notes:
 %   Column order and units: 
@@ -52,5 +53,9 @@ if flag_sort
     [~,i_sort] = sort(xy(1,:));
     data = data(i_sort,:);
 end
+
+%profile name
+name_prof = fname_prof(1:max(strfind(fname_prof,'.'))-1);
+name_prof   = strrep(name_prof,'_',' ');
 
 end
