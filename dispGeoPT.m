@@ -1,5 +1,6 @@
 function dispGeoPT()
 % Main function for computing slip displacement from geolocated points
+close all;
 
 %libraries
 addpath('./src/')
