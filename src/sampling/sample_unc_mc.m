@@ -55,10 +55,10 @@ if flag_samp(1)
         wsize = max(wsize, 1);
     
         %window position (side A)
-        s1_ws = (max(side1_data(:,6)) - wsize) * rand();
+        s1_ws = (max(side1_data(:,6)) - 0.8*wsize) * rand();
         s1_we = s1_ws + wsize;
         %window position (side A)
-        s2_ws = (max(side2_data(:,6)) - wsize) * rand();
+        s2_ws = (max(side2_data(:,6)) - 0.8*wsize) * rand();
         s2_we = s2_ws + wsize;
 
         %points

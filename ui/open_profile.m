@@ -1,4 +1,4 @@
-function [data,prof_name] = open_profile(flag_sort)
+function [data,prof_name,fpath] = open_profile(flag_sort)
 %UI to load slip profile
 %
 % Input Arguments:
@@ -7,6 +7,7 @@ function [data,prof_name] = open_profile(flag_sort)
 % Output Arguments:
 %   data (mat[n_pt,5]): coordinates and uncertainty of profile's points
 %   prof_name (string): profile name
+%   fpath (string):     file path
 
 %short input data
 if nargin < 1; flag_sort = false; end

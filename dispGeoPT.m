@@ -15,11 +15,11 @@ set(0, 'DefaultTextFontName', 'Arial');
 set(0,'DefaultLegendFontSize',12)
 
 %load file
-[data,prof_name] = open_profile(true);
+[data,prof_name,dir_inpt] = open_profile(true);
 prof_fname = sprintf('%s',strrep(prof_name,' ','_'));
 
 %select output
-[dir_out,dir_fig] = select_output_folder();
+[dir_out,dir_fig] = select_output_folder(dir_inpt,prof_fname);
 
 %points to exclude
 [data,figid] = remove_points(data);
@@ -31,13 +31,13 @@ if isempty(flag_analysis); return; end
 
 %analysis
 switch flag_analysis
-    case 1
+    case 1 %deterministic analysis
         [disp_net,disp_horiz,disp_vert,apert_width,df_summary,fname_prof_analysis] = ...
             analysis_deterministic(prof_name,prof_fname,data,dir_out,dir_fig);
-    case 2
+    case 2 %probabilistic analysis
         [disp_net,disp_horiz,disp_vert,apert_width,df_summary,fname_prof_analysis] = ...
             analysis_probabilistic(prof_name,prof_fname,data,dir_out,dir_fig);
-    case 3
+    case 3 %uncertainty quantification
         [names_samp_cmp,disp_net,disp_horiz,disp_vert,apert_width,df_summary,fname_prof_analysis,rank_unc_idx] = ...
             analysis_uncrtquantification(prof_name,prof_fname,data,dir_out,dir_fig);
 end
@@ -52,24 +52,8 @@ if flag_analysis < 3
     df_disp        = [df_disp_net,df_disp_horiz,df_disp_vert,df_apert_width];
     %save displacement statistic
     writetable(df_disp,[dir_out,fname_prof_analysis,'_summary_disp','.csv'],'WriteRowNames',true)
-    %report 
-    fprintf([repmat('=',1,80),'\nProfile Name: %s\n\n'],prof_name)
-    switch flag_analysis
-        case 1
-            fprintf('Measured Displacement:\n')
-            fprintf('\tNet (mean, min, max):\t\t %.2fm, %.2fm, %.2fm\n',           mean(disp_net),    min(disp_net),    max(disp_net))
-            fprintf('\tHorizontal (mean, min, max):\t %.2fm, %.2fm, %.2fm\n',      mean(disp_horiz),  min(disp_horiz),  max(disp_horiz))
-            fprintf('\tVertical (mean, min, max):\t %.2fm, %.2fm, %.2fm\n',        mean(disp_vert),   min(disp_vert),   max(disp_vert))
-            fprintf('Aperture\n\tWdith (mean, min, max):\t %.2fm, %.2fm, %.2fm\n', mean(apert_width), min(apert_width), max(apert_width))
-        case 2
-            fprintf('Measured Displacement:\n')
-            fprintf('\tNet (mean, std, min, max):\t\t %.2fm, %.2fm, %.2fm, %.2fm\n',             mean(disp_net),    std(disp_net),    min(disp_net),    max(disp_net))
-            fprintf('\tHorizontal (mean, std, min, max):\t %.2fm, %.2fm, %.2fm, %.2fm\n',        mean(disp_horiz),  std(disp_horiz),  min(disp_horiz),  max(disp_horiz))
-            fprintf('\tVertical (mean, std, min, max):\t\t %.2fm, %.2fm, %.2fm, %.2fm\n',        mean(disp_vert),   std(disp_vert),   min(disp_vert),   max(disp_vert))
-            fprintf('Aperture\n\tWdith (mean, std, min, max):\t\t %.2fm, %.2fm, %.2fm, %.2fm\n', mean(apert_width), std(apert_width), min(apert_width), max(apert_width))      
-    end
-    fprintf([repmat('=',1,80),'\n'])
-
+    %generate report 
+    report = generate_report(flag_analysis,prof_name,disp_net,disp_horiz,disp_vert,apert_width);
     %plot displacement distributions
     %net displacement
     fig_title = [prof_name,': Net Displacement'];
@@ -102,18 +86,9 @@ if flag_analysis == 3
     end
     %save displacement statistic
     writetable(df_disp,[dir_out,fname_prof_analysis,'_summary_disp','.csv'],'WriteRowNames',true)
-    %report 
-    fprintf([repmat('=',1,80),'\nProfile Name: %s\n\n'],prof_name)
-    for c = rank_unc_idx
-            fprintf([repmat(' ---  ',1,13),'\n'],prof_name)
-            fprintf('%s Uncertainty, Measured Displacement:\n', names_samp_cmp{c})
-            fprintf('\tNet (mean, std, min, max):\t\t %.2fm, %.2fm, %.2fm, %.2fm\n',             mean(disp_net{c}),    std(disp_net{c}),    min(disp_net{c}),    max(disp_net{c}))
-            fprintf('\tHorizontal (mean, std, min, max):\t %.2fm, %.2fm, %.2fm, %.2fm\n',        mean(disp_horiz{c}),  std(disp_horiz{c}),  min(disp_horiz{c}),  max(disp_horiz{c}))
-            fprintf('\tVertical (mean, std, min, max):\t\t %.2fm, %.2fm, %.2fm, %.2fm\n',        mean(disp_vert{c}),   std(disp_vert{c}),   min(disp_vert{c}),   max(disp_vert{c}))
-            fprintf('Aperture\n\tWdith (mean, std, min, max):\t\t %.2fm, %.2fm, %.2fm, %.2fm\n', mean(apert_width{c}), std(apert_width{c}), min(apert_width{c}), max(apert_width{c}))      
-    end
-    fprintf([repmat('=',1,80),'\n'])
-
+    %generate report 
+    report = generate_report(flag_analysis,prof_name,disp_net,disp_horiz,disp_vert,apert_width, ...
+                             rank_unc_idx,names_samp_cmp);
     %plot displacement distributions
     for c = 1:length(names_samp_cmp)
         prof_samp_fname = sprintf('%s_samp_%s',fname_prof_analysis ...
@@ -136,5 +111,13 @@ if flag_analysis == 3
         savefig(figid,[dir_fig,prof_samp_fname,'_disp_vert','.fig'])
     end
 end
+
+%print report
+%screen
+for r = report; fprintf(r{1}); end
+%plain file
+fileid = fopen([dir_out,fname_prof_analysis,'_summary_out','.txt'],'w');
+for r = report; fprintf(fileid, report{1}); end
+fclose(fileid);
 
 end
