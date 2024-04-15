@@ -17,7 +17,7 @@ prcnt = reshape(prcnt,length(prcnt),1);
 %quantiles
 disp_prcnt  = quantile(disp_array,prcnt);
 %quantile names
-rname_prcnt = arrayfun(@(p) sprintf('prcnt_%2.u',round(p*100)), prcnt, 'UniformOutput',false);
+rname_prcnt = arrayfun(@(p) sprintf('prcnt_%02.0f',round(p*100)), prcnt, 'UniformOutput',false);
 
 %summarize disp data
 df_disp = table([disp_mean;disp_median;disp_std;disp_min;disp_max;disp_prcnt], ...
