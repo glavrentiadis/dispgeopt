@@ -25,16 +25,21 @@ set(0,'DefaultLegendFontSize',18)
 [data,prof_name,dir_inpt] = open_profile(true);
 prof_fname = sprintf('%s',strrep(prof_name,' ','_'));
 
+%select analysis
+flag_analysis = input_analysis();
+if isempty(flag_analysis); return; end
+
 %select output
-[dir_out,dir_fig] = select_output_folder(dir_inpt,prof_fname);
+switch flag_analysis
+    case 1; sdir_out = sprintf('%s_deterministic',prof_fname);
+    case 2; sdir_out = sprintf('%s_probabilistic',prof_fname);
+    case 3; sdir_out = sprintf('%s_uncrtquant',prof_fname);
+end
+[dir_out,dir_fig] = select_output_folder(dir_inpt,sdir_out);
 
 %points to exclude
 [data,figid] = remove_points(data);
 close(figid)
-
-%select analysis
-flag_analysis = input_analysis();
-if isempty(flag_analysis); return; end
 
 %analysis
 switch flag_analysis
