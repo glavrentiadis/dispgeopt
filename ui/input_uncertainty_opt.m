@@ -8,7 +8,7 @@ if nargin < 1; flag_rup_unc = true; end
 dlgtitle  = 'Uncertainty Options';
 dlgprompt = 'Select uncertainty components:';
 %uncertainty options
-list_opt = {'Projection Window';'Projection Points';'Horizontal Location';'Vertical Location';'Rupture Location';'Rupture Azimuth'};
+list_opt = {'Projection Points';'Projection Window';'Horizontal Location';'Vertical Location';'Rupture Location';'Rupture Azimuth'};
 
 %input rupture uncertainty
 if ~flag_rup_unc; list_opt = list_opt(1:4); end

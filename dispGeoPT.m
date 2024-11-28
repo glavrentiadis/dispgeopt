@@ -9,17 +9,17 @@ addpath('./src/optimfun/')
 addpath('./ui/')
 addpath('./ui/plotting')
 
-% %figure properties
-% set(0,'defaultAxesFontSize',13)
-% set(0,'DefaultAxesFontName','Arial')
-% set(0, 'DefaultTextFontName', 'Arial');
-% set(0,'DefaultLegendFontSize',12)
-
 %figure properties
-set(0,'defaultAxesFontSize',20)
+set(0,'defaultAxesFontSize',13)
 set(0,'DefaultAxesFontName','Arial')
 set(0, 'DefaultTextFontName', 'Arial');
-set(0,'DefaultLegendFontSize',18)
+set(0,'DefaultLegendFontSize',12)
+
+% %figure properties
+% set(0,'defaultAxesFontSize',20)
+% set(0,'DefaultAxesFontName','Arial')
+% set(0, 'DefaultTextFontName', 'Arial');
+% set(0,'DefaultLegendFontSize',18)
 
 %load file
 [data,prof_name,dir_inpt] = open_profile(true);

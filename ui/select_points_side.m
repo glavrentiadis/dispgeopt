@@ -1,14 +1,15 @@
-function [data_selected,side_idx,figid] = select_points_side(data, side_name)
+function [data_selected,side_idx,figid,polygon_select] = select_points_side(data, side_name)
 %UI for selecting points for each side
 %
 % Input Arguments:
-%   data          (mat[n_select,5]): geolocated points 
-%   side_name     (string): name for side to select points
+%   data           (mat[n_select,5]): geolocated points 
+%   side_name      (string): name for side to select points
 %
 % Output Arguments:
-%   data_selected (mat[n_select,5]): coordinates and uncertainty of selected points
-%   side_idx      (array[n_select):  indices of selected points
-%   figid         (handle):          figure handle showing selected points
+%   data_selected  (mat[n_select,5]):   coordinates and uncertainty of selected points
+%   side_idx       (array[n_select):    indices of selected points
+%   figid          (handle):            figure handle showing selected points
+%   polygon_select (mat[n_select+1,1]): selection polygon
 
 %default input
 if nargin < 2; side_name=''; end
@@ -73,9 +74,12 @@ side_idx = find(i_in);
 %selected data
 data_selected = data(i_in,:);
 
+%selection polygon
+polygon_select = [x_reg,y_reg;x_reg(1),y_reg(1)];
+
 %plot closed polygon and selected points
 figure(figid);
-plot([x_reg;x_reg(1)],[y_reg;y_reg(1)],'k--o');
+plot(polygon_select(:,1),polygon_select(:,2),'k--o');
 figid = plot_points_select(data_selected,figid);
 
 end

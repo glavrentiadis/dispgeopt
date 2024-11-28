@@ -1,4 +1,4 @@
-function [flag_analysis] = input_analysis(inputArg1,inputArg2)
+function [flag_analysis] = input_analysis()
 %UI for analysis option
 
 %window options

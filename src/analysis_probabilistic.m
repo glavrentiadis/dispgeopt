@@ -16,29 +16,46 @@ n_samp = input_nsamples();
 pause(1); close(figid);
 [prj2_data,side2_idx,figid] = select_points_side(data,'B');
 pause(1); close(figid);
+
+%identify origin on each side
+[s1_orj_idx,s2_orj_idx] = find_side_origin(prj1_data, prj2_data);
+
 %figure selected points projections
 figid = plot_profile(data);
 [figid, hl1] = plot_points_select(prj1_data,figid,"#0072BD");
 [figid, hl2] = plot_points_select(prj2_data,figid,"#D95319");
+%plot origin of each side 
+plot(prj1_data(s1_orj_idx,1),prj1_data(s1_orj_idx,2),'o', ...
+     'MarkerEdgeColor','#0072BD','MarkerFaceColor','#0072BD','MarkerSize',15,'LineWidth',2);
+plot(prj2_data(s2_orj_idx,1),prj2_data(s2_orj_idx,2),'o', ...
+     'MarkerEdgeColor','#D95319','MarkerFaceColor','#D95319','MarkerSize',15,'LineWidth',2);
+%add title and legend
 title(sprintf('%s: Selected projection points',prof_name))
 legend([hl1,hl2],{'Side A','Side B'},'Location','northeast')
 saveas(figid,[dir_fig,fname_prof_main,'_select_points','.png'])
 savefig(figid,[dir_fig,fname_prof_main,'_select_points','.fig'])
 pause(1); close(figid);
 
-%main projection window 
+%main projection vector 
 [~,prc_v_main,~,~,~] = projection_fit(prj1_data(:,1:2));
 
 %projection window size
 if flag_samp(1)
-    winsize_info = input_prjwinsize();
+    [prjwin_opt,prjwin_info] = input_prjwin();
     %compute along projection distance
     [~,~,t1_array,~,~] = projection_fit(prj1_data(:,1:2));
     [~,~,t2_array,~,~] = projection_fit(prj2_data(:,1:2));
+    %compute side distance from origin (positive further from rupture)
+    t1_array = t1_array - t1_array(s1_orj_idx);
+    t2_array = t2_array - t2_array(s2_orj_idx);
+    t1_array = sign(mean( t1_array )) * t1_array;
+    t2_array = sign(mean( t2_array )) * t2_array;
+    %offset side distance from minimum value
     prj1_data(:,6) = t1_array - min(t1_array);
     prj2_data(:,6) = t2_array - min(t2_array);
 else
-    winsize_info = [inf, 0];
+    prjwin_opt = 2; %dummy selection for window size
+    prjwin_info = [inf, 0];
     prj1_data(:,6) = nan;
     prj2_data(:,6) = nan;
 end
@@ -106,7 +123,8 @@ for j = 1:n_samp
     [prj1_samp{j}, prj2_samp{j}, rup_pt_samp(j,:), rup_azmth_samp(j), i_s1{j}, i_s2{j}]  = sample_unc_mc(flag_samp,prj1_data,prj2_data, ...
                                                                                                          rup_loc_mean,rup_loc_std, ...
                                                                                                          rup_azmth_mean,rup_azmth_std, ...
-                                                                                                         samp_p,winsize_info, ...
+                                                                                                         samp_p, ...
+                                                                                                         prjwin_opt,prjwin_info, ...
                                                                                                          rup_ax,rup_zone_lim);
     
     %compute projection;

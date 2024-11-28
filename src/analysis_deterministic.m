@@ -13,6 +13,40 @@ fname_prof_main = sprintf('%s_deterministic_analysis',fname_prof_main);
 % n_iter = str2double(n_iter{1});
 n_iter = 100;
 
+%selection method
+flag_select = input_pointselect();
+%select master set of projection points (if not manual each iteration)
+if flag_select~=1
+    [prj1_data_master,side1_idx_master,figid,side1_polygon_master] = select_points_side(data,'A');
+    pause(1); close(figid);
+    [prj2_data_master,side2_idx_master,figid,side2_polygon_master] = select_points_side(data,'B');
+    pause(1); close(figid);
+
+    %collect projection parameters
+    switch flag_select
+        case 2 %feature size
+            prj_params = input_prjwinsize(true);
+        case 3
+            prj_params = input_prjwinlin();
+        otherwise
+            error("Invalid selection option")
+    end
+
+    %identify origin on each side
+    [s1_orj_idx,s2_orj_idx] = find_side_origin(prj1_data_master, prj2_data_master);
+    %compute along projection distance
+    [~,~,t1_array,~,~] = projection_fit(prj1_data_master(:,1:2));
+    [~,~,t2_array,~,~] = projection_fit(prj2_data_master(:,1:2));
+    %compute side distance from origin (positive further from rupture)
+    t1_array = t1_array - t1_array(s1_orj_idx);
+    t2_array = t2_array - t2_array(s2_orj_idx);
+    t1_array = sign(mean( t1_array )) * t1_array;
+    t2_array = sign(mean( t2_array )) * t2_array;
+    %offset side distance from minimum value
+    prj1_data_master(:,6) = t1_array - min(t1_array);
+    prj2_data_master(:,6) = t2_array - min(t2_array);
+end
+
 %initialize arrays
 %displacement measurement
 disp_net   = nan(n_iter,1);
@@ -44,11 +78,37 @@ while flag2iter
     fname_prof_iter = sprintf('%s_iter_%i',fname_prof_main,j);
 
     %select projection points
-    [prj1_data,side1_idx{j},figid] = select_points_side(data,'A');
-    pause(1); close(figid);
-    [prj2_data,side2_idx{j},figid] = select_points_side(data,'B');
-    pause(1); close(figid);
-
+    if flag_select == 1 %manual 
+        [prj1_data,side1_idx{j},figid] = select_points_side(data,'A');
+        pause(1); close(figid);
+        [prj2_data,side2_idx{j},figid] = select_points_side(data,'B');
+        pause(1); close(figid);
+    else %feature size or linearity
+        [feat1_loc,figid] = select_feature_loc(data, prj1_data_master, side1_polygon_master, 'A', "#0072BD");
+        pause(1); close(figid);
+        [feat2_loc,figid] = select_feature_loc(data, prj2_data_master, side2_polygon_master, 'B', "#D95319");
+        pause(1); close(figid);
+        %select projection points
+        switch flag_select
+            case 2 %feature size
+                i_prj1 = select_feature_window(prj1_data_master, prj_params, false, feat1_loc);
+                i_prj2 = select_feature_window(prj2_data_master, prj_params, false, feat2_loc);
+            case 3 %feature linearity
+                i_prj1 = select_feature_linear(prj1_data_master, prj_params, false, feat1_loc);
+                i_prj2 = select_feature_linear(prj2_data_master, prj_params, false, feat2_loc);
+            otherwise
+                error("Invalid selection option")
+        end
+        if isempty(i_prj1) || isempty(i_prj2)
+            warning("No projection points where selected")
+            continue
+        end
+        %subset indices and projection points
+        side1_idx{j} = side1_idx_master(i_prj1);
+        side2_idx{j} = side2_idx_master(i_prj2);
+        prj1_data = prj1_data_master(i_prj1,:);
+        prj2_data = prj2_data_master(i_prj2,:);
+    end
     %figure selected points projections
     figid = plot_profile(data);
     [figid, hl1] = plot_points_select(prj1_data,figid,"#0072BD");
